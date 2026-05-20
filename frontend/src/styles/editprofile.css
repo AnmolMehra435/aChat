@@ -1,0 +1,132 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.edit-profile-container{
+    width: 100%;
+    min-height: 100vh;
+    background-color: #0f172a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.edit-profile-card{
+    width: 100%;
+    max-width: 500px;
+    background-color: #1e293b;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.edit-title{
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.edit-profile-form{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.avatar-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-avatar{
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #3b82f6;
+}
+
+.avatar-input{
+    color: white;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label{
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.form-group input{
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    background-color: #334155;
+    color: white;
+    font-size: 1rem;
+}
+
+.form-group input::placeholder{
+    color: #94a3b8;
+}
+
+.buttons{
+    display: flex;
+    justify-content: space-between;
+}
+
+.exit-btn{
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #3b82f6;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 10%;
+}
+
+.save-btn{
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #3b82f6;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 10%;
+}
+
+.save-btn:hover, .exit-btn:hover{
+    background-color: #2563eb;
+}
+
+@media(max-width: 600px){
+
+    .edit-profile-card{
+        padding: 20px;
+    }
+
+    .edit-title{
+        font-size: 1.6rem;
+    }
+
+    .profile-avatar{
+        width: 100px;
+        height: 100px;
+    }
+}

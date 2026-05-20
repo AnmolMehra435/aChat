@@ -27,4 +27,37 @@ const getUser = async (req,res) => {
     })
 }
 
-module.exports = { getUser }
+const updatedata = async (req, res) => {
+    try{
+        const email = req.body.email;
+        const name = req.body.name;
+        const username = req.body.username;
+        let avatar;
+
+        if(req.file){
+            avatar = req.file.path;
+        }
+
+        await User.updateOne(
+            { email: email },
+            {
+               $set: 
+                { name: name,
+                email: email,
+                avatar: avatar,
+                username: username}
+            }
+        )
+
+        res.json({
+            "message": "updated"
+        })
+    }catch(err){
+        return res.status(403).json({
+            "message": "error ocurred"
+        })
+    }
+}
+
+
+module.exports = { getUser, updatedata }

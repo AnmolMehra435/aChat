@@ -67,7 +67,23 @@ function Dashboard(){
 
                 <div className="profile-section">
                     <div className="avatar-placeholder">
-                        {user.avatar || user.name.charAt(0).toUpperCase()}
+                         {
+                                user?.avatar ? (
+
+                                    <img
+                                        src={user.avatar}
+                                        alt="profile"
+                                        className="profile-image"
+                                    />
+
+                                ) : (
+
+                                    <span>
+                                        {user?.name?.charAt(0).toUpperCase()}
+                                    </span>
+
+                                )
+                        }
                     </div>
 
                     <h2 className="username">
