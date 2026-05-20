@@ -29,13 +29,13 @@ app.use('/api/auth', require('./routes/authRoutes'))
 
 app.use('/api/users', require('./routes/userRoutes'))
 
+app.use('/api/conversations', require('./routes/conversationRoutes'))
+
 app.get('/api/dashboard', verifyAccessJwt, (req, res) => {
     res.json({
         "verified": true
     })
 })
-
-app.get('/api/conversations', require('./routes/conversationRoutes'))
 
 app.get('/', (req, res) => {
     res.json({

@@ -3,22 +3,22 @@ const Conversation = require('../models/conversation');
 const createConversation = async (req, res) => {
     try{
         const senderId = req.body.senderId;
-        const recieverId = req.body.reciever;
+        const receiverId = req.body.receiverId;
 
         const existingConversation = await Conversation.findOne({
             members: {
-                $all: [ senderId, recieverId ]
+                $all: [ senderId, receiverId ]
             }
         }) 
 
         if(existingConversation){
             return res.json({
-                conversaiton: existingConversation
+                conversation: existingConversation
             })
         }
 
         const newConversation = await Conversation.create({
-            members: [ senderId, recieverId ]
+            members: [ senderId, receiverId ]
         })
 
         return res.json({
@@ -32,15 +32,18 @@ const createConversation = async (req, res) => {
     }
 }
 
-const getUserConversation = async () => {
+const getUserConversation = async (req, res) => {
     try{
         const userId = req.query.userId;
         
-        const conversation = await Conversation.findOne({
+        const conversations = await Conversation.find({
             members: {
                 $in: [userId]
             }
-        })
+        }).populate(
+            'members',
+            '-password'
+        );
 
         res.json({
             conversations
@@ -51,4 +54,4 @@ const getUserConversation = async () => {
 }
 
 
-module.exports = [ createConversation, getUserConversation ]
+module.exports = { createConversation, getUserConversation }

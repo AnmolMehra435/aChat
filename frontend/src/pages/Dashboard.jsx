@@ -15,6 +15,29 @@ function Dashboard(){
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
+    const [conversations, setConversations] = useState([]);
+
+    const [selectedConversation, setSelectedConversation] = useState(null);
+
+
+    const fetchConversations = async () => {
+        try{
+            const response = await axios.get(
+                `${url}/api/conversations?userId=${user._id}`
+            )
+
+            setConversations(response.data.conversations)
+        }catch(err){
+            console.log(err.message)
+        }
+    }
+
+    useEffect(() => {
+        if(user?._id){
+            fetchConversations();
+        }
+    }, [user])
+
     const searchUser = async (query) => {
 
         if(!query.trim()){
@@ -37,7 +60,6 @@ function Dashboard(){
             setSearchResults([])
         }
     }
-
 
     useEffect(() => {
         const validateUser = async () => {
@@ -79,21 +101,30 @@ function Dashboard(){
         navigate('/editprofile')
     }
 
-    const searchedConversation = async (recieverId) => {
+    const searchedConversation = async (receiverId) => {
         try{
-            const response = await axios.post(
+            await axios.post(
                 `${url}/api/conversations/create`,
                 {
                     senderId: user._id,
-                    recieverId: recieverId
+                    receiverId: receiverId
 
                 }
             )
-            console.log(response.data);
+            fetchConversations();
         }catch(err){
-            console.log(err.console)
+            console.log(err.message)
         }
     }
+
+    const selectedUser =
+    selectedConversation?.members.find(
+
+        (member) =>
+            member._id !== user._id
+
+    );
+
 
   if(loading){
     return(
@@ -154,35 +185,177 @@ function Dashboard(){
                         }}
                     />
                 </div>
-
-                <div className="chat-list">
-
+            
+                <div className='chat-list'>
                     {
-                        searchResults.length > 0 ? (
+                        search.trim().length > 0 ? (
 
-                            searchResults.map((searchedUser) => (
+                            searchResults.length > 0 ? (
 
-                                <div
-                                    key={searchedUser._id}
-                                    onClick={searchedConversation(searchedUser._id)}
-                                    className="searched-user"
-                                >
+                                searchResults.map((searchedUser) => (
 
-                                    <div className="searched-avatar">
+                                    <div
+                                        key={searchedUser._id}
+                                        className="searched-user"
+                                        onClick={() =>
+                                            searchedConversation(searchedUser._id)
+                                        }
+                                    >
+
+                                        <div className="searched-avatar">
+
+                                            {
+                                                searchedUser.avatar ? (
+
+                                                    <img
+                                                        src={searchedUser.avatar}
+                                                        alt="avatar"
+                                                        className="searched-avatar-image"
+                                                    />
+
+                                                ) : (
+
+                                                    <span>
+                                                        {searchedUser.name
+                                                            .charAt(0)
+                                                            .toUpperCase()}
+                                                    </span>
+
+                                                )
+                                            }
+
+                                        </div>
+
+                                        <div className="searched-user-info">
+
+                                            <h4>{searchedUser.name}</h4>
+
+                                            <p>
+                                                @{searchedUser.username}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                ))
+
+                            ) : (
+
+                                <p className="empty-chat">
+                                    No users found
+                                </p>
+
+                            )
+
+                        ) : (
+
+                            conversations.length > 0 ? (
+
+                                conversations.map((conversation) => {
+
+                                    const otherUser =
+                                        conversation.members.find(
+
+                                            (member) =>
+                                                member._id !== user._id
+
+                                        );
+
+                                    return(
+
+                                        <div
+                                            key={conversation._id}
+                                            className="conversation-item"
+                                            onClick={() =>
+                                                setSelectedConversation(conversation)
+                                            }
+                                        >
+
+                                            <div className="conversation-avatar">
+
+                                                {
+                                                    otherUser?.avatar ? (
+
+                                                        <img
+                                                            src={otherUser.avatar}
+                                                            alt="avatar"
+                                                            className="conversation-avatar-image"
+                                                        />
+
+                                                    ) : (
+
+                                                        <span>
+                                                            {otherUser?.name
+                                                                ?.charAt(0)
+                                                                .toUpperCase()}
+                                                        </span>
+
+                                                    )
+                                                }
+
+                                            </div>
+
+                                            <div className="conversation-info">
+
+                                                <h4>
+                                                    {otherUser?.name}
+                                                </h4>
+
+                                                <p>
+                                                    @{otherUser?.username}
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+                                    )
+
+                                })
+
+                            ) : (
+
+                                <p className="empty-chat">
+                                    No conversations yet
+                                </p>
+
+                            )
+
+                        )
+                    }
+                </div>
+
+            </div>
+
+            <div className="chat-area">
+
+                {
+                    selectedConversation ? (
+
+                        <>
+
+                            <div className="chat-header">
+
+                                <div className="chat-user">
+
+                                    <div className="chat-user-avatar">
 
                                         {
-                                            searchedUser.avatar ? (
+                                            selectedUser?.avatar ? (
 
                                                 <img
-                                                    src={searchedUser.avatar}
+                                                    src={selectedUser.avatar}
                                                     alt="avatar"
-                                                    className="searched-avatar-image"
+                                                    className="chat-user-avatar-image"
                                                 />
 
                                             ) : (
 
                                                 <span>
-                                                    {searchedUser.name.charAt(0).toUpperCase()}
+                                                    {selectedUser?.name
+                                                        ?.charAt(0)
+                                                        .toUpperCase()}
                                                 </span>
 
                                             )
@@ -190,41 +363,67 @@ function Dashboard(){
 
                                     </div>
 
-                                    <div className="searched-user-info">
+                                    <div className="chat-user-info">
 
-                                        <h4>{searchedUser.name}</h4>
+                                        <h3>
+                                            {selectedUser?.name}
+                                        </h3>
 
-                                        <p>@{searchedUser.username}</p>
+                                        <p>
+                                            @{selectedUser?.username}
+                                        </p>
 
                                     </div>
 
                                 </div>
 
-                            ))
+                            </div>
 
-                        ) : (
+                            <div className="messages-area">
 
-                            <p className="empty-chat">
-                                No users found
+                                <p className="no-messages">
+                                    No messages yet
+                                </p>
+
+                            </div>
+
+                            <div className="message-input-container">
+
+                                <input
+                                    type="text"
+                                    placeholder="Type a message..."
+                                    className="message-input"
+                                />
+
+                                <button className="send-btn">
+                                    Send
+                                </button>
+
+                            </div>
+
+                        </>
+
+                    ) : (
+
+                        <div className="no-chat-selected">
+
+                            <h1>No chat selected</h1>
+
+                            <p>
+                                Select a conversation to start chatting
                             </p>
 
-                        )
-                    }
+                        </div>
+
+                    )
+                }
 
             </div>
 
-            </div>
-
-            <div className="chat-area">
-                <div className="no-chat-selected">
-                    <h1>No chat selected</h1>
-                    <p>Select a user to start chatting</p>
-                </div>
-            </div>
-
-        </div>
+    </div>
     )
 }
+
 
   return(
     <h1>Forbidden</h1>
