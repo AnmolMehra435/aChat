@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { sendAccessToken } from '../services/verifyJwtService.js'
+import { useNavigate } from 'react-router-dom'
+import '../styles/dashboard.css'
 import axios from 'axios'
 
 function Dashboard(){
     const url = import.meta.env.VITE_BACKEND_URL;
+    const navigate = useNavigate();
 
     const [validate, setValidate] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -39,6 +42,17 @@ function Dashboard(){
         validateUser();
     }, []);
 
+    const logout = () =>{
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken')
+        navigate('/')
+    }
+
+    const editPage = () => {
+        navigate('/editprofile')
+    }
+
+
   if(loading){
     return(
         <h1>Loading....</h1>
@@ -47,9 +61,55 @@ function Dashboard(){
 
   if(validate){
     return (
-        <h1>Welcome {user?.name}</h1>
+        <div className="dashboard-container">
+
+            <div className="sidebar">
+
+                <div className="profile-section">
+                    <div className="avatar-placeholder">
+                        {user.avatar || user.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    <h2 className="username">
+                        {user?.name}
+                    </h2>
+                    <div className='buttons'>
+                        <button className='edit-btn' onClick={editPage}>
+                            Edit
+                        </button>
+
+                        <button className="logout-btn" onClick={logout}>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                <div className="search-section">
+                    <input
+                        type="text"
+                        placeholder="Search users..."
+                        className="search-input"
+                    />
+                </div>
+
+                <div className="chat-list">
+                    <p className="empty-chat">
+                        No chats yet
+                    </p>
+                </div>
+
+            </div>
+
+            <div className="chat-area">
+                <div className="no-chat-selected">
+                    <h1>No chat selected</h1>
+                    <p>Select a user to start chatting</p>
+                </div>
+            </div>
+
+        </div>
     )
-  }
+}
 
   return(
     <h1>Forbidden</h1>

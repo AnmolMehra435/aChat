@@ -17,12 +17,13 @@ const registerUser = async (req, res) => {
     const duplicate = await User.findOne({
         email: email
     })
-
+    
     if(duplicate){
         return res.status(409).json({
             "message": "user already exists"
         })
     }
+    const username = email.split('@')[0];
 
     try{
         const hashPwd = await bcrypt.hash(password, 10) 
@@ -30,6 +31,7 @@ const registerUser = async (req, res) => {
         const user = await User.create({
             name: name,
             email: email,
+            username: username,
             password: hashPwd
         })
 

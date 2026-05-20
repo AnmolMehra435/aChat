@@ -2,6 +2,7 @@ import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import EditProfile from './pages/EditProfile.jsx';
 
 function App(){
 
@@ -13,6 +14,10 @@ function App(){
         {
             path: '/dashboard',
             element: <Dashboard/>
+        },
+        {
+            path: '/editprofile',
+            element: <EditProfile/>
         }
     ])
     return (
