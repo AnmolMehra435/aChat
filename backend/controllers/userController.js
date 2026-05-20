@@ -59,5 +59,33 @@ const updatedata = async (req, res) => {
     }
 }
 
+const searchUser = async (req, res) => {
+    try{
+        const query = req.query.query;
 
-module.exports = { getUser, updatedata }
+        if(!query){
+            return res.json({
+                user: []
+            })
+        }
+
+        const users = await User.find(
+            {
+                username:{
+                    $regex: query,
+                    $options: 'i'
+                }
+            }
+        ).select('-password');
+
+        res.json({
+            users
+        })
+    }catch(err){
+        console.log(err.message)
+        res.status(500).json({ message: "Server error" })
+    }
+}
+
+
+module.exports = { getUser, updatedata, searchUser }

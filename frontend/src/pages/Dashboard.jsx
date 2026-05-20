@@ -12,6 +12,33 @@ function Dashboard(){
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState({});
 
+    const [search, setSearch] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+
+    const searchUser = async (query) => {
+
+        if(!query.trim()){
+
+            setSearchResults([]);
+
+            return;
+        }
+
+        try{
+            const response = await axios.get(
+                `${url}/api/users/search?query=${query}`
+            )
+
+            console.log(response.data)
+
+            setSearchResults(response.data.users)
+        }catch(err){
+            console.log(err.message)
+            setSearchResults([])
+        }
+    }
+
+
     useEffect(() => {
         const validateUser = async () => {
             try{
@@ -52,6 +79,21 @@ function Dashboard(){
         navigate('/editprofile')
     }
 
+    const searchedConversation = async (recieverId) => {
+        try{
+            const response = await axios.post(
+                `${url}/api/conversations/create`,
+                {
+                    senderId: user._id,
+                    recieverId: recieverId
+
+                }
+            )
+            console.log(response.data);
+        }catch(err){
+            console.log(err.console)
+        }
+    }
 
   if(loading){
     return(
@@ -105,14 +147,71 @@ function Dashboard(){
                         type="text"
                         placeholder="Search users..."
                         className="search-input"
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            searchUser(e.target.value)
+                        }}
                     />
                 </div>
 
                 <div className="chat-list">
-                    <p className="empty-chat">
-                        No chats yet
-                    </p>
-                </div>
+
+                    {
+                        searchResults.length > 0 ? (
+
+                            searchResults.map((searchedUser) => (
+
+                                <div
+                                    key={searchedUser._id}
+                                    onClick={searchedConversation(searchedUser._id)}
+                                    className="searched-user"
+                                >
+
+                                    <div className="searched-avatar">
+
+                                        {
+                                            searchedUser.avatar ? (
+
+                                                <img
+                                                    src={searchedUser.avatar}
+                                                    alt="avatar"
+                                                    className="searched-avatar-image"
+                                                />
+
+                                            ) : (
+
+                                                <span>
+                                                    {searchedUser.name.charAt(0).toUpperCase()}
+                                                </span>
+
+                                            )
+                                        }
+
+                                    </div>
+
+                                    <div className="searched-user-info">
+
+                                        <h4>{searchedUser.name}</h4>
+
+                                        <p>@{searchedUser.username}</p>
+
+                                    </div>
+
+                                </div>
+
+                            ))
+
+                        ) : (
+
+                            <p className="empty-chat">
+                                No users found
+                            </p>
+
+                        )
+                    }
+
+            </div>
 
             </div>
 

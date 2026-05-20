@@ -35,6 +35,8 @@ app.get('/api/dashboard', verifyAccessJwt, (req, res) => {
     })
 })
 
+app.get('/api/conversations', require('./routes/conversationRoutes'))
+
 app.get('/', (req, res) => {
     res.json({
         "message": "server is running"

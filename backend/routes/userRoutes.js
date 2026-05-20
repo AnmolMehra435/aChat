@@ -7,4 +7,6 @@ router.get('/me', userController.getUser);
 
 router.put('/updateprofile', upload.single('avatar'), userController.updatedata)
 
+router.get('/search', userController.searchUser)
+
 module.exports = router;
