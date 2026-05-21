@@ -16,9 +16,49 @@ function Dashboard(){
     const [searchResults, setSearchResults] = useState([]);
 
     const [conversations, setConversations] = useState([]);
+    const [mobileChatOpen, setMobileChatOpen] = useState(false);
 
     const [selectedConversation, setSelectedConversation] = useState(null);
 
+    const [messages, setMessages] = useState([]);
+    const [messageText, setMessageText] = useState('');  
+
+
+    const fetchMessages = async (conversationId) => {
+        try{
+
+            setMessages([])
+
+            const response = await axios.get(
+                `${url}/api/messages/${conversationId}`
+            )
+
+            setMessages(response.data.messages)
+        }catch(err){
+            console.log(err.message);
+        }
+    }
+
+    const sendMessageText = async () => {
+        if(!messageText.trim()) return;
+
+        try{
+            const response = await axios.post(
+                `${url}/api/messages/`,
+                {
+                    conversationId: selectedConversation._id,
+                    sender: user._id,
+                    text: messageText
+                }
+            )
+
+            setMessages([...messages, response.data.message])
+
+            setMessageText('')
+        }catch(err){
+            console.log(err.message)
+        }
+    }
 
     const fetchConversations = async () => {
         try{
@@ -55,6 +95,7 @@ function Dashboard(){
             console.log(response.data)
 
             setSearchResults(response.data.users)
+
         }catch(err){
             console.log(err.message)
             setSearchResults([])
@@ -103,7 +144,7 @@ function Dashboard(){
 
     const searchedConversation = async (receiverId) => {
         try{
-            await axios.post(
+            const response = await axios.post(
                 `${url}/api/conversations/create`,
                 {
                     senderId: user._id,
@@ -111,6 +152,14 @@ function Dashboard(){
 
                 }
             )
+            setSelectedConversation(response.data.conversation);
+
+            setMobileChatOpen(true);
+
+            fetchMessages(response.data.conversation._id);
+
+            setSearch('');
+
             fetchConversations();
         }catch(err){
             console.log(err.message)
@@ -136,7 +185,11 @@ function Dashboard(){
     return (
         <div className="dashboard-container">
 
-            <div className="sidebar">
+            <div
+                className={`sidebar ${
+                    mobileChatOpen ? 'hide-sidebar' : ''
+                }`}
+            >
 
                 <div className="profile-section">
                     <div className="avatar-placeholder">
@@ -197,8 +250,11 @@ function Dashboard(){
                                     <div
                                         key={searchedUser._id}
                                         className="searched-user"
-                                        onClick={() =>
+                                        onClick={() => {
                                             searchedConversation(searchedUser._id)
+                                            setSearch('');
+                                            setSearchResults([])
+                                        }
                                         }
                                     >
 
@@ -267,8 +323,11 @@ function Dashboard(){
                                         <div
                                             key={conversation._id}
                                             className="conversation-item"
-                                            onClick={() =>
+                                            onClick={() => {
                                                 setSelectedConversation(conversation)
+                                                setMobileChatOpen(true);
+                                                fetchMessages(conversation._id)
+                                                }
                                             }
                                         >
 
@@ -328,7 +387,11 @@ function Dashboard(){
 
             </div>
 
-            <div className="chat-area">
+            <div
+                className={`chat-area ${
+                    mobileChatOpen ? 'show-chat' : ''
+                }`}
+            >
 
                 {
                     selectedConversation ? (
@@ -336,6 +399,24 @@ function Dashboard(){
                         <>
 
                             <div className="chat-header">
+                                {
+                                    mobileChatOpen && (
+
+                                        <button
+                                            className="back-btn"
+                                            onClick={() => {
+
+                                                setMobileChatOpen(false);
+
+                                                setSelectedConversation(null);
+
+                                            }}
+                                        >
+                                            ← Back
+                                        </button>
+
+                                    )
+                                }
 
                                 <div className="chat-user">
 
@@ -381,9 +462,58 @@ function Dashboard(){
 
                             <div className="messages-area">
 
-                                <p className="no-messages">
-                                    No messages yet
-                                </p>
+                                {
+                                    messages.length > 0 ? (
+
+                                        messages.map((message) => {
+
+                                            const senderId =
+                                                message.sender?._id ||
+                                                message.sender;
+
+                                            const isMyMessage =
+                                                senderId?.toString() ===
+                                                user._id?.toString();
+
+                                            return(
+
+                                                <div
+                                                    key={message._id}
+                                                    className={
+                                                        isMyMessage
+                                                            ? 'message-row own-message-row'
+                                                            : 'message-row other-message-row'
+                                                    }
+                                                >
+
+                                                    <div
+                                                        className={
+                                                            isMyMessage
+                                                                ? 'message-bubble my-message'
+                                                                : 'message-bubble other-message'
+                                                        }
+                                                    >
+
+                                                        {message.text}
+
+                                                    </div>
+
+                                                </div>
+
+                                            )
+
+                                        })
+
+                                    ) : (
+
+                                        <div className="no-chat-yet">
+
+                                            <p>No chat yet</p>
+
+                                        </div>
+
+                                    )
+                                }
 
                             </div>
 
@@ -393,9 +523,11 @@ function Dashboard(){
                                     type="text"
                                     placeholder="Type a message..."
                                     className="message-input"
+                                    value={messageText}
+                                    onChange={(e) => {setMessageText(e.target.value)}}
                                 />
 
-                                <button className="send-btn">
+                                <button className="send-btn" onClick={sendMessageText}>
                                     Send
                                 </button>
 

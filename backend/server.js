@@ -31,6 +31,8 @@ app.use('/api/users', require('./routes/userRoutes'))
 
 app.use('/api/conversations', require('./routes/conversationRoutes'))
 
+app.use('/api/messages', require('./routes/messagesRoutes'))
+
 app.get('/api/dashboard', verifyAccessJwt, (req, res) => {
     res.json({
         "verified": true
