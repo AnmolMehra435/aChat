@@ -1,116 +1,162 @@
 # MERN Realtime Chat Application
 
-A modern full-stack realtime chat application built using the MERN stack with JWT authentication, Cloudinary media uploads, MongoDB relationship modeling, protected routes, and scalable conversation architecture.
+A modern full-stack realtime chat platform built using the MERN stack with JWT authentication, Socket.IO realtime communication, MongoDB relationship modeling, protected routes, Cloudinary media uploads, and scalable conversation architecture.
 
 ---
 
-#  Features
+# Features
 
-##  Authentication & Authorization
+## Authentication & Authorization
 
-- JWT Access Token authentication
-- Refresh Token support
-- Protected routes
-- Persistent login sessions
-- Secure backend verification middleware
-
----
-
-##  User System
-
-- User registration and login
-- Fetch authenticated user data
-- Edit profile functionality
-- Upload profile avatars
-- Cloudinary image hosting integration
+* JWT Access Token authentication
+* Refresh Token support
+* Protected routes
+* Persistent login sessions
+* Middleware-based backend verification
+* Secure route protection architecture
 
 ---
 
-##  Dashboard
+# User System
 
-- Responsive chat dashboard UI
-- User sidebar
-- Conversation sidebar
-- Search users functionality
-- Dynamic conversation rendering
+## Features
 
----
-
-##  Conversation System
-
-- Create conversations between users
-- Prevent duplicate conversations
-- Fetch all user conversations
-- MongoDB relationship modeling using references
-- Mongoose populate functionality
+* User registration and login
+* Fetch authenticated user data
+* Edit profile functionality
+* Upload profile avatars
+* Cloudinary image hosting integration
+* Protected profile routes
 
 ---
 
-##  Responsive Design
+# Dashboard
 
-- Mobile responsive layout
-- Sidebar adaptation
-- Flexible chat UI
+## Features
+
+* Responsive realtime chat dashboard
+* Mobile responsive layout
+* Dynamic conversation sidebar
+* User search functionality
+* Realtime chat rendering
+* Conversation selection system
+* Responsive mobile chat navigation
 
 ---
 
-#  Tech Stack
+# Conversation System
+
+## Features
+
+* Create conversations between users
+* Prevent duplicate conversations
+* Fetch all user conversations
+* Dynamic conversation rendering
+* MongoDB relationship modeling
+* Mongoose populate functionality
+
+---
+
+# Message System
+
+## Features
+
+* Send text messages
+* Store messages in MongoDB
+* Fetch conversation messages
+* Realtime message rendering
+* Conditional message alignment
+* Dynamic message updates
+* Conversation-based message history
+
+---
+
+# Realtime Communication
+
+## Socket.IO Features
+
+* Persistent realtime connections
+* Live message delivery
+* Conversation-based socket rooms
+* Event-driven architecture
+* Instant UI synchronization
+* Realtime frontend updates
+
+---
+
+# Responsive Design
+
+## Features
+
+* Mobile responsive UI
+* Adaptive sidebar layout
+* Mobile chat transitions
+* Flexible chat interface
+* Responsive messaging layout
+
+---
+
+# Tech Stack
 
 ## Frontend
 
-- React.js
-- React Router DOM
-- Axios
-- CSS3
+* React.js
+* React Router DOM
+* Axios
+* CSS3
+* Socket.IO Client
 
 ---
 
 ## Backend
 
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* Socket.IO
 
 ---
 
-## Authentication
+# Authentication
 
-- JSON Web Tokens (JWT)
-- Access Tokens
-- Refresh Tokens
-
----
-
-## File Uploads
-
-- Multer
-- Cloudinary
-- multer-storage-cloudinary
+* JSON Web Tokens (JWT)
+* Access Tokens
+* Refresh Tokens
+* Middleware Authentication
 
 ---
 
-## Architecture
+# File Uploads
 
-- REST API Architecture
-- MVC Pattern
-- Middleware-based Authentication
-- MongoDB Relationship Modeling
+* Multer
+* Cloudinary
+* multer-storage-cloudinary
 
 ---
 
-#  Project Structure
+# Architecture
+
+* REST API Architecture
+* Realtime WebSocket Architecture
+* MVC Pattern
+* Middleware-based Authentication
+* MongoDB Relationship Modeling
+* Event-driven Communication
+* REST + Socket.IO Hybrid System
+
+---
+
+# Project Structure
 
 ```bash
 backend/
 │
-├── config/
-│   └── cloudinary.js
-│
 ├── controllers/
 │   ├── authController.js
 │   ├── userController.js
-│   └── conversationController.js
+│   ├── conversationController.js
+│   └── messageController.js
 │
 ├── middleware/
 │   ├── multer.js
@@ -118,12 +164,17 @@ backend/
 │
 ├── models/
 │   ├── user.js
-│   └── conversation.js
+│   ├── conversation.js
+│   └── message.js
 │
 ├── routes/
 │   ├── authRoutes.js
 │   ├── userRoutes.js
-│   └── conversationRoutes.js
+│   ├── conversationRoutes.js
+│   └── messageRoutes.js
+│
+├── config/
+│   └── cloudinary.js
 │
 └── server.js
 
@@ -148,7 +199,7 @@ frontend/
 
 ---
 
-#  Database Models
+# Database Models
 
 ## User Model
 
@@ -178,7 +229,19 @@ frontend/
 
 ---
 
-#  Authentication Flow
+## Message Model
+
+```js
+{
+   conversationId: ObjectId,
+   sender: ObjectId,
+   text: String
+}
+```
+
+---
+
+# Authentication Flow
 
 ```text
 User Login
@@ -196,29 +259,7 @@ Protected routes verified using JWT middleware
 
 ---
 
-#  Profile Update Flow
-
-```text
-User selects avatar image
-        ↓
-React creates FormData
-        ↓
-Axios sends multipart/form-data
-        ↓
-Multer middleware processes image
-        ↓
-Cloudinary uploads image
-        ↓
-Cloudinary returns image URL
-        ↓
-MongoDB stores avatar URL
-        ↓
-Frontend renders image
-```
-
----
-
-#  Conversation Flow
+# Conversation Flow
 
 ```text
 Search user
@@ -236,12 +277,76 @@ Conversation stored in MongoDB
       ↓
 Populate members data
       ↓
-Frontend renders conversations sidebar
+Frontend renders conversation sidebar
 ```
 
 ---
 
-# 🌐 Current Implemented APIs
+# Message Flow
+
+```text
+User selects conversation
+        ↓
+Frontend fetches conversation messages
+        ↓
+Messages rendered dynamically
+        ↓
+User sends message
+        ↓
+REST API stores message in MongoDB
+        ↓
+Socket.IO emits realtime event
+        ↓
+Conversation room receives event
+        ↓
+Frontend updates instantly
+```
+
+---
+
+# Socket.IO Architecture
+
+```text
+Frontend connects to Socket.IO server
+        ↓
+Backend creates persistent socket connection
+        ↓
+User joins conversation room
+        ↓
+Frontend emits send_message event
+        ↓
+Backend receives event
+        ↓
+Backend emits receive_message to room
+        ↓
+Connected users receive message instantly
+```
+
+---
+
+# Profile Update Flow
+
+```text
+User selects avatar image
+        ↓
+React creates FormData
+        ↓
+Axios sends multipart/form-data
+        ↓
+Multer middleware processes image
+        ↓
+Cloudinary uploads image
+        ↓
+Cloudinary returns image URL
+        ↓
+MongoDB stores avatar URL
+        ↓
+Frontend renders updated image
+```
+
+---
+
+# Current Implemented APIs
 
 ## Authentication Routes
 
@@ -272,17 +377,25 @@ GET    /api/conversations
 
 ---
 
-# ⚙️ Environment Variables
+## Message Routes
 
-Create a `.env` file inside the backend folder:
+```http
+POST   /api/messages
+GET    /api/messages/:conversationId
+```
+
+---
+
+# Environment Variables
+
+Create a `.env` file inside backend folder:
 
 ```env
 PORT=5000
 
 MONGO_URL=your_mongodb_url
 
-ACCESS_SECRET_KEY=your_access_secret
-REFRESH_SECRET_KEY=your_refresh_secret
+SUPER_SECRET_KEY=your_secret_key
 
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
@@ -291,7 +404,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ---
 
-#  Installation
+# Installation
 
 ## Backend Setup
 
@@ -317,54 +430,59 @@ npm run dev
 
 ---
 
-#  Upcoming Features
-
-- Realtime messaging with Socket.IO
-- Message schema implementation
-- Live message delivery
-- Online/offline user status
-- Typing indicators
-- Image messages
-- Notifications
-- Last message previews
-- Message timestamps
-- Docker deployment
-- CI/CD pipeline
-- HTTPS with NGINX
-- AWS deployment
-
----
-
-#  Learning Highlights
+# Learning Highlights
 
 This project demonstrates understanding of:
 
-- Full-stack MERN development
-- JWT authentication systems
-- REST API architecture
-- MongoDB relationships
-- Mongoose populate
-- Cloud storage integration
-- React state management
-- Protected frontend routing
-- Middleware architecture
-- Responsive frontend design
+* Full-stack MERN development
+* JWT authentication systems
+* Refresh token architecture
+* Protected frontend routing
+* Protected backend routes
+* REST API architecture
+* Realtime communication systems
+* WebSocket architecture
+* Socket.IO event flow
+* Conversation room management
+* MongoDB relationship modeling
+* Mongoose populate
+* React state management
+* Middleware architecture
+* Event-driven backend systems
+* Responsive frontend architecture
+* Cloudinary media storage integration
+
+---
+
+# Upcoming Features
+
+* Typing indicators
+* Online/offline user status
+* Message timestamps
+* Image messages
+* Seen message status
+* Notifications
+* Redis caching
+* Docker deployment
+* CI/CD pipeline
+* HTTPS with NGINX
+* AWS deployment
 
 ---
 
 # Future Deployment Stack
 
-| Service | Technology |
-|---|---|
-| Frontend | Vercel |
-| Backend | AWS EC2 |
-| Database | MongoDB Atlas |
-| Media Storage | Cloudinary |
-| Reverse Proxy | NGINX |
-| CI/CD | GitHub Actions |
+| Service       | Technology     |
+| ------------- | -------------- |
+| Frontend      | Vercel         |
+| Backend       | AWS EC2        |
+| Database      | MongoDB Atlas  |
+| Media Storage | Cloudinary     |
+| Reverse Proxy | NGINX          |
+| CI/CD         | GitHub Actions |
 
 ---
 
 # Author
 
-Built and engineered by **Anmol Mehra**.
+Built and engineered by **Anmol Mehra**
