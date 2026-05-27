@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { sendAccessToken } from '../services/verifyJwtService.js'
 import { useNavigate } from 'react-router-dom'
 import '../styles/dashboard.css'
 import axios from 'axios'
+import { io } from 'socket.io-client';
 
 function Dashboard(){
     const url = import.meta.env.VITE_BACKEND_URL;
     const navigate = useNavigate();
+
+    const socket = useRef();
 
     const [validate, setValidate] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -52,8 +55,7 @@ function Dashboard(){
                 }
             )
 
-            setMessages([...messages, response.data.message])
-
+            socket.current.emit('send_message', response.data.message);
             setMessageText('')
         }catch(err){
             console.log(err.message)
@@ -71,6 +73,42 @@ function Dashboard(){
             console.log(err.message)
         }
     }
+
+    useEffect(() => {
+
+        socket.current = io('http://localhost:5000');
+
+        return () => {
+            socket.current.disconnect();
+        }
+
+    }, []);
+
+    useEffect(() => {
+
+        if(selectedConversation){
+
+            socket.current.emit(
+                'join_conversation',
+                selectedConversation._id
+            );
+
+        }
+
+    }, [selectedConversation]);
+
+    useEffect(() => {
+
+        socket.current.on(
+            'receive_message',
+            (newMessage) => {
+
+                setMessages((prev) => [...prev, newMessage])
+
+            }
+        );
+
+    }, []);
 
     useEffect(() => {
         if(user?._id){

@@ -1,9 +1,43 @@
 const express = require('express');
+const http = require('http');
 const app = express();
+const server = http.createServer(app);
 const mongoose = require('mongoose')
 const cors = require('cors');
 const verifyAccessJwt = require('./middleware/verifyAccessJwt');
 require('dotenv').config()
+
+const { Server } = require('socket.io');
+
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:5173'
+    }
+})
+
+io.on('connection', (socket) => {
+    console.log("user connected");  
+    socket.on('send_message', (message) => {
+        io.to(message.conversationId).emit(
+        'receive_message',
+        message
+    );
+
+    });
+
+    socket.on(
+        'join_conversation',
+        (conversationId) => {
+
+            socket.join(conversationId);
+
+            console.log(
+                `Joined room ${conversationId}`
+            );
+
+        }
+    );
+})
 
 const port = process.env.PORT || 5000;
 
@@ -15,7 +49,7 @@ const connectDB = async () => {
     try{
         await mongoose.connect(process.env.MONGO_URL);
 
-        app.listen(port, () => {
+        server.listen(port, () => {
             console.log(`Server is running on port: ${port}`)
         })
         
